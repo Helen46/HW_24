@@ -2,7 +2,7 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 
 from config.settings import NULLABLE
-from lms.models import Course
+from lms.models import Course, Lesson
 
 
 class User(AbstractUser):
@@ -66,7 +66,7 @@ class Payment(models.Model):
         **NULLABLE
     )
     paid_lesson = models.ForeignKey(
-        Course,
+        Lesson,
         on_delete=models.CASCADE,
         related_name="lesson",
         **NULLABLE
