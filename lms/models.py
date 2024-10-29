@@ -37,6 +37,7 @@ class Lesson(models.Model):
         on_delete=models.SET_NULL,
         verbose_name="Курск",
         help_text="Выберите курс",
+        related_name="lesson_set",
         **NULLABLE
     )
     preview = models.ImageField(
@@ -47,7 +48,7 @@ class Lesson(models.Model):
     )
     description = models.TextField(
         verbose_name="Описание урока",
-    help_text="Укажите описание урока"
+        help_text="Укажите описание урока"
     )
     video_linc = models.URLField(
         verbose_name="Ссылка на видеоурок",
