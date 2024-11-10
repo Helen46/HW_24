@@ -73,8 +73,8 @@ class SubsAPIView(APIView):
     permission_classes = (IsAuthenticated,)
 
     def post(self, request, *args, **kwargs):
-        user = request.user
-        course_id = request.data.get('course_id')
+        user = self.request.user
+        course_id = self.request.data.get('course')
         course_item = get_object_or_404(Course, id=course_id)
         subs_item = Subs.objects.filter(user=user, course=course_item)
         if subs_item.exists():
