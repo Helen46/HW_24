@@ -56,6 +56,34 @@ class LmsTestCase(APITestCase):
             data.get("name"), "Test"
         )
 
+    def test_lesson_list(self):
+        url = reverse("lms:lessons_list")
+        response = self.client.get(url)
+        data = response.json()
+        # print(data)
+        self.assertEqual(
+            response.status_code, status.HTTP_200_OK
+        )
+        result = {
+            "count": 1,
+            "next": None,
+            "previous": None,
+            "results": [
+                {
+                    "id": self.lesson.pk,
+                    "name": self.lesson.name,
+                    "course": self.course.pk,
+                    "preview": None,
+                    "description": self.lesson.description,
+                    "video_linc": None,
+                    "owner": self.user.pk
+                }
+            ]
+        }
+        self.assertEqual(
+            data, result
+        )
+
     def test_lesson_delete(self):
         """ Тест удаления урока"""
         url = reverse("lms:lessons_delete", args=(self.lesson.pk,))
