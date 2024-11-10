@@ -1,16 +1,19 @@
 from rest_framework.fields import SerializerMethodField
-from rest_framework.serializers import ModelSerializer
+from rest_framework import serializers
 
 from lms.models import Course, Lesson
+from lms.validators import validate_permitted_resources
 
 
-class LessonSerializer(ModelSerializer):
+class LessonSerializer(serializers.ModelSerializer):
+    video_linc = serializers.CharField(validators=[validate_permitted_resources])
+
     class Meta:
         model = Lesson
         fields = "__all__"
 
 
-class CourseSerializer(ModelSerializer):
+class CourseSerializer(serializers.ModelSerializer):
     lessons = LessonSerializer(many=True, read_only=True, source='lesson_set')
 
     class Meta:
@@ -18,7 +21,7 @@ class CourseSerializer(ModelSerializer):
         fields = "__all__"
 
 
-class CourseDetailSerializer(ModelSerializer):
+class CourseDetailSerializer(serializers.ModelSerializer):
     count_lessons_course = SerializerMethodField()
 
     def get_count_lessons_course(self, object):

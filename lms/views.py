@@ -37,6 +37,8 @@ class LessonCreateApiView(CreateAPIView):
         new_lesson.save()
 
 
+
+
 class LessonListApiView(ListAPIView):
     queryset = Lesson.objects.all()
     serializer_class = LessonSerializer
