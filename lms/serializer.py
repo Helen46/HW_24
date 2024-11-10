@@ -1,7 +1,7 @@
 from rest_framework.fields import SerializerMethodField
 from rest_framework import serializers
 
-from lms.models import Course, Lesson
+from lms.models import Course, Lesson, Subs
 from lms.validators import validate_permitted_resources
 
 
@@ -30,3 +30,9 @@ class CourseDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Course
         fields = ("name", "count_lessons_course")
+
+
+class SubsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Subs
+        fields = "__all__"

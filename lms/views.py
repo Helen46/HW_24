@@ -1,10 +1,13 @@
+from django.shortcuts import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.generics import ListAPIView, CreateAPIView, RetrieveAPIView, UpdateAPIView, DestroyAPIView
 
-from lms.models import Course, Lesson
+from lms.models import Course, Lesson, Subs
 from lms.permissions import IsOwner, IsModer
-from lms.serializer import CourseSerializer, LessonSerializer, CourseDetailSerializer
+from lms.serializer import CourseSerializer, LessonSerializer, CourseDetailSerializer, SubsSerializer
 
 
 class CourseViewSet(ModelViewSet):
@@ -37,8 +40,6 @@ class LessonCreateApiView(CreateAPIView):
         new_lesson.save()
 
 
-
-
 class LessonListApiView(ListAPIView):
     queryset = Lesson.objects.all()
     serializer_class = LessonSerializer
@@ -61,3 +62,27 @@ class LessonDestroyApiView(DestroyAPIView):
     queryset = Lesson.objects.all()
     serializer_class = LessonSerializer
     permission_classes = (IsAuthenticated, ~IsModer | IsOwner,)
+
+
+class SubsAPIView(APIView):
+    queryset = Subs.objects.all()
+    serializer_class = SubsSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request, *args, **kwargs):
+        user = request.user
+        course_id = request.data.get('course_id')
+        course_item = get_object_or_404(Course, id=course_id)
+        subs_item = Subs.objects.filter(user=user, course=course_item)
+        if subs_item.exists():
+            subs_item.delete()
+            message = 'Подписка удалена'
+        else:
+            Subs.objects.create(user=user, course=course_item)
+            message = 'Подписка добавлена'
+        return Response({"message": message})
+
+
+class SubsListAPIView(ListAPIView):
+    serializer_class = SubsSerializer
+    queryset = Subs.objects.all()
