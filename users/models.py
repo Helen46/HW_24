@@ -42,10 +42,10 @@ class User(AbstractUser):
 
 class Payment(models.Model):
     CASH = "cash"
-    CASHLESS = "cashless"
+    CARD = "card"
     PAYMENT_TYPE = (
-        (CASH, 'Наличный'),
-        (CASHLESS, 'Безналичный')
+        (CASH, 'Наличными'),
+        (CARD, 'Картой')
     )
     user = models.ForeignKey(
         User,
@@ -81,6 +81,16 @@ class Payment(models.Model):
         default=CASH,
         verbose_name='Способ оплаты',
         help_text="Выберите способ оплаты"
+    )
+    session_id = models.CharField(
+        max_length=255,
+        **NULLABLE,
+        verbose_name="ID сессии"
+    )
+    link = models.URLField(
+        max_length=400,
+        **NULLABLE,
+        verbose_name="Ссылка на оплату"
     )
 
     class Meta:

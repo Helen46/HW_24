@@ -7,3 +7,5 @@ ipython==8.29.0
 django-filter==24.3
 djangorestframework-simplejwt==5.3.1
 drf-yasg==1.21.8
+redis==5.2.0
+stripe==11.2.0

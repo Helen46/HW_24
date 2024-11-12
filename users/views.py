@@ -6,6 +6,7 @@ from rest_framework.viewsets import ModelViewSet
 
 from users.models import User, Payment
 from users.serializer import UserSerializer, PaymentSerializer
+from users.services import create_stripe_product, create_stripe_price, create_stripe_session
 
 
 class PaymentViewSet(ModelViewSet):
@@ -17,6 +18,21 @@ class PaymentViewSet(ModelViewSet):
 
 class PaymentCreateAPIView(CreateAPIView):
     serializer_class = PaymentSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def perform_create(self, serializer):
+        course = serializer.validated_data["paid_course"]
+        amount = serializer.validated_data["amount"]
+        payment_type = serializer.validated_data["payment_type"]
+
+        if payment_type:
+            payment = serializer.save(user=self.request.user)
+            product = create_stripe_product(course_name=course.name)
+            price = create_stripe_price(product=product, amount=amount)
+            session_id, session_url = create_stripe_session(price)
+            payment.session_id = session_id
+            payment.link = session_url
+            payment.save()
 
 
 class UserCreateAPIView(CreateAPIView):
