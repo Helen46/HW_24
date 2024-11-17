@@ -1,4 +1,5 @@
 from django.shortcuts import get_object_or_404
+from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -9,6 +10,7 @@ from lms.models import Course, Lesson, Subs
 from lms.paginations import LmsPagination
 from lms.permissions import IsOwner, IsModer
 from lms.serializer import CourseSerializer, LessonSerializer, CourseDetailSerializer, SubsSerializer
+from lms.tasks import send_mailing_obout_subs, send_mailing_obout_update
 
 
 class CourseViewSet(ModelViewSet):
@@ -29,6 +31,11 @@ class CourseViewSet(ModelViewSet):
             self.permission_classes = (~IsModer | IsOwner,)
 
         return super().get_permissions()
+
+    def perform_update(self, serializer):
+        course_pk = serializer.instance.id
+        send_mailing_obout_update.delay(course_pk)
+        serializer.save()
 
 
 class LessonCreateApiView(CreateAPIView):
@@ -72,6 +79,7 @@ class SubsAPIView(APIView):
     serializer_class = SubsSerializer
     permission_classes = (IsAuthenticated,)
 
+    @action(detail=True, method="post")
     def post(self, request, *args, **kwargs):
         user = self.request.user
         course_id = self.request.data.get('course')
@@ -83,6 +91,7 @@ class SubsAPIView(APIView):
         else:
             Subs.objects.create(user=user, course=course_item)
             message = 'Подписка добавлена'
+            send_mailing_obout_subs.delay(course_item.name, user.email)
         return Response({"message": message})
 
 
