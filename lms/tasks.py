@@ -1,9 +1,11 @@
+import datetime
 from celery import shared_task
 from django.core.mail import send_mail
 from django.utils import timezone
 
 from config import settings
 from lms.models import Course, Subs
+from users.models import User
 
 
 @shared_task
@@ -32,3 +34,16 @@ def send_mailing_obout_update(course_pk):
             settings.EMAIL_HOST_USER,
             email_list
         )
+
+
+@shared_task
+def block_inactive_users():
+    today = timezone.now().date()
+    users = User.objects.filter(is_active=True)
+    for user in users:
+        if user.last_login:
+            if user.last_login.date() + datetime.timedelta(days=30) < today:
+                user.is_active = False
+                user.save()
+
+
