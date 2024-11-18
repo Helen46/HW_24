@@ -20,7 +20,7 @@ def send_mailing_obout_subs(course, email):
 @shared_task
 def send_mailing_obout_update(course_pk):
     """Отправка письма об обновлении курса"""
-    course = Course.objects.get(pk=course_pk).first()
+    course = Course.objects.get(pk=course_pk)
     subs = Subs.objects.filter(course=course)
     email_list = []
     for sub in subs:
