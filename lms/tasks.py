@@ -30,7 +30,7 @@ def send_mailing_obout_update(course_pk):
     if email_list:
         return send_mail(
             "Информация об обновлении",
-            f"Курс {course.name}, на который вы подписаны, был обнавлен",
+            f"Курс {course.name}, на который вы подписаны, был обновлен",
             settings.EMAIL_HOST_USER,
             email_list
         )
